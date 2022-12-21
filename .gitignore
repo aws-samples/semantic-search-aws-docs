@@ -1,0 +1,5 @@
+/application/.env
+/application/env.sh
+/ingestion/conda-env
+/ingestion/data/awsdocs/
+/ingestion/data/

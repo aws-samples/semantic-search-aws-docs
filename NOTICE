@@ -1,0 +1,7 @@
+The Semantic Search on AWS Docs repository includes the following third-party software/licensing:
+- application/frontend/utils.py
+- application/frontend/webapp.py
+are taken and modified from Haystack (https://github.com/deepset-ai/haystack)
+- https://github.com/deepset-ai/haystack/tree/main/ui/ui/utils.py
+- https://github.com/deepset-ai/haystack/tree/main/ui/ui/webapp.py
+Copyright 2021 deepset GmbH. Licensed under the Apache License, Version 2.0 

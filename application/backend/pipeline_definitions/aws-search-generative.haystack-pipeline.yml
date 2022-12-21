@@ -1,0 +1,64 @@
+# To allow your IDE to autocomplete and validate your YAML pipelines, name them as <name of your choice>.haystack-pipeline.yml
+
+version: ignore
+
+components:    # define all the building-blocks for Pipeline
+  - name: DocumentStore
+    type: OpenSearchDocumentStore
+    params:
+      host: openSearchDomain.REGION.es.amazonaws.com
+      index: indexname
+      password: openSearchPassword
+      port: 443
+      return_embedding: false
+      username: openSearchUsername
+      similarity: cosine
+  - name: Retriever
+    type: EmbeddingRetriever
+    params:
+      document_store: DocumentStore    # params can reference other components defined in the YAML
+      top_k: 5    
+      embedding_model: sentence-transformers/all-mpnet-base-v2
+      model_format: sentence_transformers
+  - name: BM25Retriever
+    type: BM25Retriever
+    params:
+      document_store: DocumentStore    # params can reference other components defined in the YAML
+      top_k: 5
+  - name: Reader
+    type: Seq2SeqGenerator
+    params:
+      model_name_or_path: vblagoje/bart_lfqa
+  - name: TextFileConverter
+    type: TextConverter
+  - name: PDFFileConverter
+    type: PDFToTextConverter
+  - name: Preprocessor
+    type: PreProcessor
+    params:
+      split_by: word
+      split_length: 1000
+  - name: FileTypeClassifier
+    type: FileTypeClassifier
+
+pipelines:
+  - name: query    # a sample extractive-qa Pipeline
+    nodes:
+      - name: Retriever
+        inputs: [Query]
+      - name: Reader
+        inputs: [Retriever]
+  - name: indexing
+    nodes:
+      - name: FileTypeClassifier
+        inputs: [File]
+      - name: TextFileConverter
+        inputs: [FileTypeClassifier.output_1]
+      - name: PDFFileConverter
+        inputs: [FileTypeClassifier.output_2]
+      - name: Preprocessor
+        inputs: [PDFFileConverter, TextFileConverter]
+      - name: Retriever
+        inputs: [Preprocessor]
+      - name: DocumentStore
+        inputs: [Retriever]

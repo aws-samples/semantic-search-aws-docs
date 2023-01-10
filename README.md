@@ -173,6 +173,6 @@ This library is licensed under the MIT-0 License. See the LICENSE file.
 
 ## Disclaimer
 
-This solution is intended to demonstrate the functionality of using machine learning models for semantic search and question answering. They are not inteded for production deployment as is.
+This solution is intended to demonstrate the functionality of using machine learning models for semantic search and question answering. They are not intended for production deployment as is.
 
 For best practices on modifying this solution for production use cases, please follow the [AWS well-architected guidance](https://aws.amazon.com/architecture/well-architected/).

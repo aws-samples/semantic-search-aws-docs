@@ -18,3 +18,8 @@ variable "private_subnets" {
   type        = list(string)
   description = "The public subnet ranges used, e.g. '10.10.0.0/24'"
 }
+variable "iam_resource_prefix" {
+  type        = string
+  description = "A prefix used for all AWS IAM resource names"
+  default = ""
+}

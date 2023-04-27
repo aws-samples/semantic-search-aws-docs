@@ -37,8 +37,12 @@ resource "aws_ecr_repository" "ingestion_job" {
 }
 
 resource "docker_registry_image" "ingestion_job" {
-  name = "${local.aws_ecr_url}/${aws_ecr_repository.ingestion_job.name}:latest"
+  name = docker_image.ingestion_job_image.name
+  
+}
 
+resource "docker_image" "ingestion_job_image" {
+  name = "${local.aws_ecr_url}/${aws_ecr_repository.ingestion_job.name}:latest"
   build {
     context    = "${path.cwd}/"
     dockerfile = "Dockerfile"

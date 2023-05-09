@@ -48,7 +48,7 @@ print(f"Started Update Embeddings, Documents: {len(dicts_aws)}")
 # Calculate and store a dense embedding for each document
 retriever = EmbeddingRetriever(
     document_store=document_store,
-    model_format = "sentence_transformers",
+    model_format = "deepset",
     embedding_model = "all-mpnet-base-v2-table"
 )
 document_store.update_embeddings(retriever)

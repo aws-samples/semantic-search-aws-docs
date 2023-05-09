@@ -49,7 +49,7 @@ print(f"Started Update Embeddings, Documents: {len(dicts_aws)}")
 retriever = EmbeddingRetriever(
     document_store=document_store,
     model_format = "sentence_transformers",
-    embedding_model = "all-mpnet-base-v2"
+    embedding_model = "all-mpnet-base-v2-table"
 )
 document_store.update_embeddings(retriever)
 

@@ -87,6 +87,7 @@ Ask any question on about the AWS documentation to see if we can find the correc
         step=1,
         on_change=reset_results,
     )
+    debug = st.sidebar.checkbox("Show debug info")
 
 
     hs_version = ""
@@ -213,5 +214,8 @@ Ask any question on about the AWS documentation to see if we can find the correc
                 st.write("**Relevance:** ", result["relevance"])
 
             st.write("___")
+        if debug:
+            st.subheader("REST API JSON response")
+            st.write(st.session_state.raw_json)
 
 main()

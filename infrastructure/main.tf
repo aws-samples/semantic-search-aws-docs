@@ -334,7 +334,7 @@ resource "aws_ecs_capacity_provider" "ec2_gpu" {
 
     managed_scaling {
       status          = "ENABLED"
-      target_capacity = 100
+      target_capacity = 50
     }
   }
 }

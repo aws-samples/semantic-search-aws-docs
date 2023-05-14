@@ -172,7 +172,7 @@ Ask any question on about the AWS documentation to see if we can find the correc
         ):
             try:
                 st.session_state.results, st.session_state.raw_json = query(
-                    question, top_k_reader=top_k_reader, top_k_retriever=top_k_retriever, answer_style=answer_style
+                    question, top_k_reader=top_k_reader, top_k_retriever=top_k_retriever, answer_style=answer_style, debug=debug
                 )
             except JSONDecodeError as je:
                 st.error("👓 &nbsp;&nbsp; An error occurred reading the results. Is the document store working?")

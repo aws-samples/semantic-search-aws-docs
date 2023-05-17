@@ -92,7 +92,7 @@ Ask any question on about the AWS documentation to see if we can find the correc
 
     hs_version = ""
     try:
-        hs_version = f" <small>(v{haystack_version()})</small>"
+        hs_version = f" <small>(v{haystack_version(answer_style=answer_style)})</small>"
     except Exception:
         pass
 
@@ -155,7 +155,7 @@ Ask any question on about the AWS documentation to see if we can find the correc
 
     # Check the connection
     with st.spinner("⌛️ &nbsp;&nbsp; Backend is starting..."):
-        if not haystack_is_ready():
+        if not haystack_is_ready(answer_style=answer_style):
             st.error("🚫 &nbsp;&nbsp; Connection Error. Is the backend running?")
             run_query = False
             reset_results()

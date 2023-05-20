@@ -67,3 +67,18 @@ The next steps guide you through ingesting the [Amazon EC2 User Guide for Linux]
     3. Run `aws ecs wait tasks-stopped --region $REGION --cluster <REPLACE_WITH_ECS_CLUSTER_ARN> --tasks <REPLACE_WITH_INGESTION_JOB_ARN>` to wait until the ingestion of the documents completes. Replace `<REPLACE_WITH_INGESTION_JOB_ARN>` with the arn of the ECS task that is running the ingestion job form the previous commands output. When the command exists with _Waiter TasksStopped failed: Max attempts exceeded_ as the message run the command again. Once the command exits without any output then the ingestion job completed.
     4. After the ingestion completes run `cd ~/environment/semantic-search-aws-docs/infrastructure && terraform output loadbalancer_url` to get the URL for the semantic search frontend.
 
+### Clean up Ingestion
+You can clean up the ingestion resources immediately after ingesting the documents into your OpenSearch store. The ingestion executes as a one-off Amazon ECS task. For a production scenario with changes to the source documents you should consider [scheduling Amazon ECS tasks](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/scheduling_tasks.html) for ingesting the latest version of documents on a schedule.
+1. In your AWS Cloud9 IDE navigate to the ingestion directory `cd ~/environment/semantic-search-aws-docs/ingestion`
+2. Run `terraform destroy -var="infra_region=$REGION" -var="infra_tf_state_s3_bucket=$S3_BUCKET" -var="aws_docs=amazon-ec2-user-guide"` to clean up the ingestion resources.
+    1. If the `REGION` variable is not set anymore you can run `eval REGION=$(terraform output infra_region)` to retrieve the region variable from the current deployment.
+    2. If the `S3_BUCKET` variable is not set anymore you can run `eval S3_BUCKET=$(terraform output infra_tf_state_s3_bucket)` to set it again.
+    3. If you do not remember which documents the current deployment ingested then you can use `terraform output aws_docs` and use the output as the input for the `aws_docs` variable in the `terraform destroy` command.
+3. Enter `yes` when Terraform prompts you _"Do you really want to destroy all resources?"_.
+
+## Clean up Infrastructure
+Destroy the resources that were deployed for the infrastructure of the semantic search application if you are not using the application anymore.
+1. In your AWS Cloud9 IDE navigate to the ingestion directory `cd ~/environment/semantic-search-aws-docs/infrastructure`
+2. Clean up the semantic search application infrastructure with the `terraform destroy -var="region=$REGION"` command. 
+    1. Run `eval REGION=$(terraform output region)` if your `REGION` variable is not set anymore.
+3. Enter `yes` when Terraform prompts you _"Do you really want to destroy all resources?"_.

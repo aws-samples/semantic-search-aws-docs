@@ -82,3 +82,4 @@ Destroy the resources that were deployed for the infrastructure of the semantic 
 2. Clean up the semantic search application infrastructure with the `terraform destroy -var="region=$REGION"` command. 
     1. Run `eval REGION=$(terraform output region)` if your `REGION` variable is not set anymore.
 3. Enter `yes` when Terraform prompts you _"Do you really want to destroy all resources?"_.
+

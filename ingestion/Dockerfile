@@ -3,11 +3,6 @@ RUN yum install -y amazon-linux-extras
 RUN amazon-linux-extras enable python3.8
 RUN yum install -y python3.8 jq wget gzip tar git
 
-RUN wget https://github.com/jgm/pandoc/releases/download/2.18/pandoc-2.18-linux-amd64.tar.gz
-RUN tar -xvzf pandoc-2.18-linux-amd64.tar.gz
-ENV PATH="/pandoc-2.18/bin:${PATH}"
-
-RUN pandoc --version
 COPY awsdocs/requirements.txt /awsdocs/requirements.txt
 RUN python3.8 -m pip --no-cache-dir install -r /awsdocs/requirements.txt
 

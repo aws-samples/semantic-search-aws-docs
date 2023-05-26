@@ -23,3 +23,8 @@ variable "iam_resource_prefix" {
   description = "A prefix used for all AWS IAM resource names"
   default = ""
 }
+variable "index_name" {
+  type = string
+  description = "Amazon OpenSearch documents index name"
+  default = "awsdocs"
+}

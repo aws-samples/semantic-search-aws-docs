@@ -40,3 +40,7 @@ output "opensearch_secret" {
 output "ingestion_job_role" {
   value = aws_iam_role.search_api.arn
 }
+
+output "index_name" {
+  value = var.index_name
+}

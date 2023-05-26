@@ -571,7 +571,7 @@ resource "aws_ecs_task_definition" "search_api" {
         },
         {
            "name": "DOCUMENTSTORE_PARAMS_INDEX",
-           "value": "awsdocs"
+           "value": "${var.index_name}"
         },
         {
            "name": "DOCUMENTSTORE_PARAMS_USERNAME",
@@ -638,7 +638,7 @@ resource "aws_ecs_task_definition" "search_api_generative" {
         },
         {
            "name": "DOCUMENTSTORE_PARAMS_INDEX",
-           "value": "awsdocs"
+           "value": "${var.index_name}"
         },
         {
            "name": "DOCUMENTSTORE_PARAMS_USERNAME",

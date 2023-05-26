@@ -7,6 +7,7 @@ from haystack.nodes.retriever import EmbeddingRetriever
 from haystack.document_stores import OpenSearchDocumentStore
 from haystack.utils import clean_wiki_text, fetch_archive_from_http, print_answers
 
+import argparse
 import json
 import sys
 import os 
@@ -17,6 +18,17 @@ from haystack.schema import Document
 import logging
 
 logger = logging.getLogger(__name__)
+
+parser = argparse.ArgumentParser(
+                    prog='AWS Semantic Search Ingestion',
+                    description='Ingests documents into Amazon OpenSearch index.',
+                    epilog='Made with ❤️ at AWS')
+
+parser.add_argument('--doc_dir', type=str,
+                    help='Directory that contains documents', default="/awsdocs/data")
+
+parser.add_argument('--index_name', type=str,
+                    help='Amazon OpenSearch index name', default="awsdocs")
 
 # Add markdown conversion
 # Licensed under Apache-2.0 license from deepset-ai haystack
@@ -98,11 +110,17 @@ def convert_files_to_docs(
 host = os.environ['OPENSEARCH_HOST']
 password = os.environ['OPENSEARCH_PASSWORD']
 
-doc_dir_aws = "/awsdocs/data"
-if len(sys.argv)>1:
-  doc_dir_aws = sys.argv[1]
+args = parser.parse_args()
+
+doc_dir_aws = args.doc_dir
+index_name = args.index_name
+#if len(sys.argv)>1:
+ # doc_dir_aws = sys.argv[1]
+ 
 
 print(f"doc_dir_aws {doc_dir_aws}")
+print(f"index_name {index_name}")
+
 
 document_store = OpenSearchDocumentStore(
         host = host,
@@ -125,7 +143,7 @@ print(dicts_aws[:3])
 print(f"Starting Ingestion, Documents: {len(dicts_aws)}")
 
 # Now, let's write the dicts containing documents to our DB.
-document_store.write_documents(dicts_aws, index="awsdocs")
+document_store.write_documents(dicts_aws, index=index_name)
 
 print(f"Finished Ingestion, Documents: {len(dicts_aws)}")
 
@@ -138,6 +156,6 @@ retriever = EmbeddingRetriever(
 )
 document_store.update_embeddings(
     retriever=retriever,
-    index="awsdocs"
+    index=index_name
 )
 print(f"Finished Update Embeddings, Documents: {len(dicts_aws)}")

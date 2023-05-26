@@ -3,7 +3,7 @@ output "infra_region" {
   value       = var.infra_region
 }
 
-output "terraform output aws_docs" {
+output "aws_docs" {
   description = "The deployment ingested these documents."
   value       = var.aws_docs
 }

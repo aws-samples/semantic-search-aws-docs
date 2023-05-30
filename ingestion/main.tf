@@ -38,7 +38,6 @@ resource "aws_ecr_repository" "ingestion_job" {
 
 resource "docker_registry_image" "ingestion_job" {
   name = docker_image.ingestion_job_image.name
-  
 }
 
 resource "docker_image" "ingestion_job_image" {
@@ -47,8 +46,8 @@ resource "docker_image" "ingestion_job_image" {
     context    = "${path.cwd}/"
     dockerfile = "Dockerfile"
     build_args = {
-      DOC_DIR = "awsdocs/data"
-      SCRIPT_NAME= "run_ingestion_awsdocs"
+      DOC_DIR = var.docs_dir
+      SCRIPT_NAME= var.script_name
     }
   }
 }

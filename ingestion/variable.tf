@@ -17,3 +17,15 @@ variable "aws_docs" {
   type        = string
   description = "The AWS Documentation to be ingested. Use 'full' or specific documents like 'amazon-eks-user-guide' "
 }
+
+variable "docs_dir" {
+  type        = string
+  description = "The local directory that contains documents to ingest into the Amazon OpenSearch index."
+  default = "mydocs/data"
+}
+
+variable "script_name" {
+  type = string
+  description = "The script that the ingestion container runs to ingest the documents into the Amazon OpenSearch index. Set to 'run_ingestion' to ingest documents from a local directory (see also variable docs_dir). Set to 'run_ingestion_awsdocs' to ingest the AWS documentation (see also aws_docs)."
+  default = "run_ingestion_awsdocs"
+}

@@ -32,7 +32,7 @@ The main components of this project are:
 ## How to deploy the solution
 
 ### Deploy with AWS Cloud9
-Follow our [step-by-step deployment instructions](AWS-Cloud9-Deployment-Readme.md) to deploy the semantic search application if you are new to AWS, Terraform, semantic search, or you prefer detailed setp-by-step instructions.
+Follow our [step-by-step deployment instructions](documentation/AWS-Cloud9-Deployment.md) to deploy the semantic search application if you are new to AWS, Terraform, semantic search, or you prefer detailed setp-by-step instructions.
 
 For more general deployment instructions follow the sections below.
 

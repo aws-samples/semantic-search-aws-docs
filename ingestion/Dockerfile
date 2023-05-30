@@ -17,7 +17,7 @@ COPY awsdocs/scripts /awsdocs/scripts
 COPY awsdocs/src /awsdocs/src
 RUN mkdir -p $DOC_DIR
 WORKDIR ${DOC_DIR}
-COPY $DOC_DIR .
+COPY "${DOC_DIR}" .
 
 RUN ln -s /awsdocs/scripts/$SCRIPT_NAME.sh /awsdocs/scripts/docker_entrypoint.sh
 

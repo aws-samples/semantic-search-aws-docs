@@ -90,7 +90,7 @@ resource "aws_lb_listener" "search_ui" {
 }
 
 resource "aws_eip" "nat_gw" {
-  vpc        = true
+  domain     = "vpc"
   depends_on = [aws_internet_gateway.main]
 }
 

@@ -3,4 +3,4 @@ SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && 
 #MAIN=dirname "$0"
 
 echo "script_dir MAIN: $SCRIPT_DIR"
-python3.8 $SCRIPT_DIR/../src/ingest.py --doc_dir ./ --index_name $2
+python3.8 $SCRIPT_DIR/../src/ingest.py --src ./ --index_name $2

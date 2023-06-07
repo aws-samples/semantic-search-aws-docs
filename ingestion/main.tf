@@ -29,6 +29,7 @@ data "aws_ecr_authorization_token" "token" {}
 
 locals {
   aws_ecr_url = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.terraform_remote_state.infra.outputs.region}.amazonaws.com"
+  build_environment = length(regexall(".*local.*", var.script_name)) > 0 ? "local": "amazonlinux:2" # if the documents are local then we use the Docker container that can handle local documents
 }
 
 resource "aws_ecr_repository" "ingestion_job" {
@@ -46,9 +47,9 @@ resource "docker_image" "ingestion_job_image" {
     context    = "${path.cwd}/"
     dockerfile = "Dockerfile"
     build_args = {
-      DOC_DIR = var.docs_dir
+      DOCS_SRC = var.docs_src
       SCRIPT_NAME= var.script_name
-    }
+      BUILD_ENV = locals.build_environment
   }
 }
 
@@ -81,7 +82,7 @@ resource "aws_ecs_task_definition" "ingestion_job" {
       "entryPoint": null,
       "portMappings":  null,
       "command": [
-        "${var.aws_docs}",
+        "${var.docs_src}",
         "${data.terraform_remote_state.infra.outputs.index_name}"
       ],
       "linuxParameters": null,
@@ -127,7 +128,7 @@ resource "null_resource" "run_ingestion_ecs_job" {
       ECS_CLUSTER_NAME   = "${data.terraform_remote_state.infra.outputs.ecs_cluster_name}"
       JOB_SUBNETS        = "${jsonencode(data.terraform_remote_state.infra.outputs.private_subnets)}"
       JOB_SECURITY_GROUP = "${data.terraform_remote_state.infra.outputs.security_group_for_open_search_access}"
-      AWSDOC             = "${var.aws_docs}"
+      DOCS_SRC           = "${var.docs_src}"
       INDEX_NAME         = "${data.terraform_remote_state.infra.outputs.index_name}"
     }
   }

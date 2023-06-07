@@ -12,10 +12,14 @@ import json
 import sys
 import os 
 
+import validators
+
 from haystack.nodes.file_converter import BaseConverter, DocxToTextConverter, PDFToTextConverter, TextConverter, MarkdownConverter
 from haystack.schema import Document
 
 import logging
+
+DEFAULT_DOCS_DIR = "docs"
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +28,8 @@ parser = argparse.ArgumentParser(
                     description='Ingests documents into Amazon OpenSearch index.',
                     epilog='Made with ❤️ at AWS')
 
-parser.add_argument('--doc_dir', type=str,
-                    help='Directory that contains documents', default="/awsdocs/data")
+parser.add_argument('--src', type=str,
+                    help='Directory or URL where documents are located', default="docs")
 
 parser.add_argument('--index_name', type=str,
                     help='Amazon OpenSearch index name', default="awsdocs")
@@ -112,11 +116,21 @@ password = os.environ['OPENSEARCH_PASSWORD']
 
 args = parser.parse_args()
 
-doc_dir_aws = args.doc_dir
+docs_src = args.src
 index_name = args.index_name
 #if len(sys.argv)>1:
  # doc_dir_aws = sys.argv[1]
- 
+try:
+    is_url = validators.url(docs_src)
+except validators.ValidationFailure:
+    is_url = False
+
+if is_url:
+    fetch_archive_from_http(url=docs_src, output_dir=DEFAULT_DOCS_DIR)
+    doc_dir_aws = DEFAULT_DOCS_DIR
+else:
+    doc_dir_aws = docs_src
+
 
 print(f"doc_dir_aws {doc_dir_aws}")
 print(f"index_name {index_name}")

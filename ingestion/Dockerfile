@@ -1,6 +1,15 @@
-FROM amazonlinux:2
+ARG BUILD_ENV="amazonlinux:2"
+ARG DOCS_SRC="awsdocs/data"
 
-ARG DOC_DIR="awsdocs/data"
+FROM amazonlinux:2 as local
+RUN mkdir -p $DOCS_SRC
+WORKDIR ${DOCS_SRC}
+COPY "${DOCS_SRC}" .
+
+
+
+FROM ${BUILD_ENV}
+ARG DOCS_SRC="awsdocs/data"
 ARG SCRIPT_NAME="run_ingestion_awsdocs"
 
 RUN yum install -y amazon-linux-extras
@@ -15,9 +24,7 @@ RUN yum -y install fontconfig
 
 COPY awsdocs/scripts /awsdocs/scripts
 COPY awsdocs/src /awsdocs/src
-RUN mkdir -p $DOC_DIR
-WORKDIR ${DOC_DIR}
-COPY "${DOC_DIR}" .
+
 
 RUN ln -s /awsdocs/scripts/$SCRIPT_NAME.sh /awsdocs/scripts/docker_entrypoint.sh
 

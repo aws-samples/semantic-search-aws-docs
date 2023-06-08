@@ -4,3 +4,4 @@ markdown>=3.3.7
 beautifulsoup4>=4.11.1
 opensearch-py>=2.0.0
 farm-haystack[opensearch,preprocessing,file-conversion]
+rfc3986-validator

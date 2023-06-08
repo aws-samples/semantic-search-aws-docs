@@ -1,21 +1,30 @@
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Union, Tuple
 from pathlib import Path
 from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from haystack.nodes.retriever import EmbeddingRetriever
 from haystack.document_stores import OpenSearchDocumentStore
-from haystack.utils import clean_wiki_text, fetch_archive_from_http, print_answers
+from urllib.parse import urlparse, unquote
+from os.path import splitext, basename
+
+import requests
+
+import io
+import gzip
+import tarfile
+import zipfile
 
 import argparse
 import json
 import sys
 import os 
 
-import validators
+from rfc3986_validator import validate_rfc3986
 
 from haystack.nodes.file_converter import BaseConverter, DocxToTextConverter, PDFToTextConverter, TextConverter, MarkdownConverter
 from haystack.schema import Document
+from haystack.utils import clean_wiki_text
 
 import logging
 
@@ -29,7 +38,7 @@ parser = argparse.ArgumentParser(
                     epilog='Made with ❤️ at AWS')
 
 parser.add_argument('--src', type=str,
-                    help='Directory or URL where documents are located', default="docs")
+                    help='Directory or URL where documents are located', default=DEFAULT_DOCS_DIR)
 
 parser.add_argument('--index_name', type=str,
                     help='Amazon OpenSearch index name', default="awsdocs")
@@ -109,23 +118,85 @@ def convert_files_to_docs(
 
     return documents
 
+# Enable downloading archive from Amazon S3 presigned url and other urls that contain data such as query parameters after the file extension.
+# Licensed under Apache-2.0 license from deepset-ai haystack
+# https://github.com/deepset-ai/haystack/blob/ba30971d8d77827da9d2c81d82f7d02bf1917d8c/haystack/utils/import_utils.py
+def fetch_archive_from_http(
+    url: str,
+    output_dir: str,
+    proxies: Optional[Dict[str, str]] = None,
+    timeout: Union[float, Tuple[float, float]] = 10.0,
+) -> bool:
+    """
+    Fetch an archive (zip, gz or tar.gz) from a url via http and extract content to an output directory.
 
+    :param url: http address
+    :param output_dir: local path
+    :param proxies: proxies details as required by requests library
+    :param timeout: How many seconds to wait for the server to send data before giving up,
+        as a float, or a :ref:`(connect timeout, read timeout) <timeouts>` tuple.
+        Defaults to 10 seconds.
+    :return: if anything got fetched
+    """
+    # verify & prepare local directory
+    path = Path(output_dir)
+    if not path.exists():
+        path.mkdir(parents=True)
+
+    is_not_empty = len(list(Path(path).rglob("*"))) > 0
+    if is_not_empty:
+        logger.info("Found data stored in '%s'. Delete this first if you really want to fetch new data.", output_dir)
+        return False
+    else:
+        logger.info("Fetching from %s to '%s'", url, output_dir)
+        
+        parsed = urlparse(url)
+        root, extension = splitext(parsed.path)
+        archive_extension = extension[1:]
+        
+        request_data = requests.get(url, proxies=proxies, timeout=timeout)
+        #archive_extension = request_data.headers['content-type']
+        #print(archive_extension)
+        #if int(r.headers['content-length']) > TOO_LONG:
+        #  request_data.connection.close()
+          # log request too long
+
+        if archive_extension == "zip":
+            zip_archive = zipfile.ZipFile(io.BytesIO(request_data.content))
+            zip_archive.extractall(output_dir)
+        elif archive_extension == "gz" and not "tar.gz" in url:
+            gzip_archive = gzip.GzipFile(fileobj=io.BytesIO(request_data.content))
+            file_content = gzip_archive.read()
+            file_name = unquote(basename(root[1:]))
+            with open(f"{output_dir}/{file_name}", "wb") as file:
+                file.write(file_content)
+        elif archive_extension in ["gz", "bz2", "xz"]:
+            tar_archive = tarfile.open(fileobj=io.BytesIO(request_data.content), mode="r|*")
+            tar_archive.extractall(output_dir)
+        else:
+            logger.warning(
+                "Skipped url %s as file type is not supported here. "
+                "See haystack documentation for support of more file types",
+                url,
+            )
+        return True
 
 host = os.environ['OPENSEARCH_HOST']
 password = os.environ['OPENSEARCH_PASSWORD']
 
 args = parser.parse_args()
 
+
 docs_src = args.src
 index_name = args.index_name
 #if len(sys.argv)>1:
  # doc_dir_aws = sys.argv[1]
-try:
-    is_url = validators.url(docs_src)
-except validators.ValidationFailure:
-    is_url = False
+#try:
+#    is_url = validators.url(docs_src)
+#except validators.ValidationFailure:
+#    is_url = False
 
-if is_url:
+if validate_rfc3986(docs_src):
     fetch_archive_from_http(url=docs_src, output_dir=DEFAULT_DOCS_DIR)
     doc_dir_aws = DEFAULT_DOCS_DIR
 else:

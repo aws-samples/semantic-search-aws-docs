@@ -28,8 +28,8 @@ data "aws_caller_identity" "current" {}
 data "aws_ecr_authorization_token" "token" {}
 
 locals {
-  aws_ecr_url = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.terraform_remote_state.infra.outputs.region}.amazonaws.com"
-  build_environment = length(regexall(".*local.*", var.script_name)) > 0 ? "local": "amazonlinux:2" # if the documents are local then we use the Docker container that can handle local documents
+  aws_ecr_url       = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.terraform_remote_state.infra.outputs.region}.amazonaws.com"
+  build_environment = length(regexall(".*local.*", var.script_name)) > 0 ? "local" : "amazonlinux:2" # if the documents are local then we use the Docker container that can handle local documents
 }
 
 resource "aws_ecr_repository" "ingestion_job" {
@@ -47,9 +47,10 @@ resource "docker_image" "ingestion_job_image" {
     context    = "${path.cwd}/"
     dockerfile = "Dockerfile"
     build_args = {
-      DOCS_SRC = var.docs_src
-      SCRIPT_NAME= var.script_name
-      BUILD_ENV = locals.build_environment
+      DOCS_SRC    = var.docs_src
+      SCRIPT_NAME = var.script_name
+      BUILD_ENV   = local.build_environment
+    }
   }
 }
 

@@ -3,9 +3,9 @@ output "infra_region" {
   value       = var.infra_region
 }
 
-output "aws_docs" {
+output "docs_src" {
   description = "The deployment ingested these documents."
-  value       = var.aws_docs
+  value       = var.docs_src
 }
 
 output "infra_tf_state_s3_bucket" {

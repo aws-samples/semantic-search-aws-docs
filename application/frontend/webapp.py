@@ -51,10 +51,10 @@ def main():
         st.session_state.raw_json = None
 
     # Title
-    st.write("# Semantic Search on AWS Documentation")
+    st.write("# Semantic Search on AWS")
     st.markdown(
         """
-Ask any question on about the AWS documentation to see if we can find the correct answer to your query!
+Ask any question on about the documents to see if we can find the correct answer to your query!
 *Note: do not use keywords, but full-fledged questions.* The demo is not optimized to deal with keyword queries and might misunderstand you.
 """,
         unsafe_allow_html=True,

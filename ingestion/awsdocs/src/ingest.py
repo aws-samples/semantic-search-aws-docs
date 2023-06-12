@@ -28,7 +28,7 @@ from haystack.utils import clean_wiki_text
 
 import logging
 
-DEFAULT_DOCS_DIR = "docs"
+DEFAULT_DOCS_DIR = "awsdocs/data"
 
 logger = logging.getLogger(__name__)
 
@@ -155,11 +155,6 @@ def fetch_archive_from_http(
         archive_extension = extension[1:]
         
         request_data = requests.get(url, proxies=proxies, timeout=timeout)
-        #archive_extension = request_data.headers['content-type']
-        #print(archive_extension)
-        #if int(r.headers['content-length']) > TOO_LONG:
-        #  request_data.connection.close()
-          # log request too long
 
         if archive_extension == "zip":
             zip_archive = zipfile.ZipFile(io.BytesIO(request_data.content))

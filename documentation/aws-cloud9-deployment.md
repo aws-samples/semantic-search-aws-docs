@@ -58,6 +58,7 @@ instance_type =  "c6i.2xlarge"
 ## Deploy Semantic Search Ingestion
 In your AWS Cloud9 environments terminal navigate to `cd ~/environment/semantic-search-aws-docs/ingestion`. 
 * If you want to ingest the AWS documentation follow the **[Ingest AWS Documentation instructions](./ingest-aws-documentation.md)**.
+* If you want to ingest your documents from a URL (for example from Amazon S3) follow the **[Ingest Documents from URL instructions](./ingest-documents-from-url.md)**.
 * If instead you like to make local documents searchable follow the **[Local Documents Ingestion instructions](./ingest-custom-local-documents.md)**.
 
 ### Clean up Ingestion

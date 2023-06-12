@@ -3,11 +3,8 @@ ARG BUILD_ENV="local"
 FROM amazonlinux:2 as local
 ARG BUILD_ENV="amazonlinux:2"
 ARG DOCS_SRC="awsdocs/data"
-ONBUILD RUN echo "hello"
-ONBUILD RUN echo $BUILD_ENV
-RUN echo ${BUILD_ENV}
 ONBUILD RUN mkdir -p $DOCS_SRC
-ONBUILD WORKDIR ${DOCS_SRC}
+ONBUILD WORKDIR "awsdocs/data"
 ONBUILD COPY "${DOCS_SRC}" .
 
 FROM ${BUILD_ENV}
@@ -28,6 +25,7 @@ RUN yum -y install fontconfig
 COPY awsdocs/scripts /awsdocs/scripts
 COPY awsdocs/src /awsdocs/src
 
+WORKDIR "awsdocs/data"
 
 RUN ln -s /awsdocs/scripts/$SCRIPT_NAME.sh /awsdocs/scripts/docker_entrypoint.sh
 

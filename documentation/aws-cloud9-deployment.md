@@ -5,7 +5,7 @@ This document walks through the deployment of Semantic Search on AWS using AWS C
 1. Open [AWS Cloud9 in AWS](https://console.aws.amazon.com/cloud9control/home)
 2. Use the **Create environment** button to create a new AWS Cloud9 IDE.
     1. Give your AWS Cloud9 environment a name, for example `semantic-search-deployment`.
-    2. Leave the other configurations as the defaults.
+    2. Select t3.small or m5.large and leave the other configurations as the defaults.
     3. **Create** the AWS Cloud9 environment.
 
 ## Open the AWS Cloud9 environment

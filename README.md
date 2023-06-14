@@ -1,8 +1,8 @@
-# Semantic Search on AWS Docs
+# Semantic Search on AWS Docs or Custom Documents
 
 This sample project demonstrates how to set up AWS infrastructure to perform semantic search and [question answering](https://en.wikipedia.org/wiki/Question_answering) on documents using a transformer machine learning models like BERT, RoBERTa, or GPT (via the [Haystack](https://github.com/deepset-ai/haystack) open source framework).
 
-As an example, users can type questions about AWS services and find answers from the AWS documentation.
+As an example, users can type questions about AWS services and find answers from the AWS documentation or custom local documents.
 
 The deployed solution support 2 answering styles:
 - `extractive question answering` will find the semantically closest

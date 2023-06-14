@@ -1,5 +1,7 @@
-farm-haystack>=1.5.0
+farm-haystack==1.16.0
 mistletoe>=0.8.2
 markdown>=3.3.7
 beautifulsoup4>=4.11.1
 opensearch-py>=2.0.0
+farm-haystack[opensearch,preprocessing,file-conversion]
+rfc3986-validator

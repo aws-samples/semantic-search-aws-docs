@@ -1,3 +1,3 @@
-FROM deepset/haystack-gpu:1.6.0
+FROM deepset/haystack:gpu-v1.16.0
 
 COPY pipeline_definitions/* /home/user/rest_api/pipeline/

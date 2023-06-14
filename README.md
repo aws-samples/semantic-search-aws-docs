@@ -1,8 +1,8 @@
-# Semantic Search on AWS Docs
+# Semantic Search on AWS Docs or Custom Documents
 
 This sample project demonstrates how to set up AWS infrastructure to perform semantic search and [question answering](https://en.wikipedia.org/wiki/Question_answering) on documents using a transformer machine learning models like BERT, RoBERTa, or GPT (via the [Haystack](https://github.com/deepset-ai/haystack) open source framework).
 
-As an example, users can type questions about AWS services and find answers from the AWS documentation.
+As an example, users can type questions about AWS services and find answers from the AWS documentation or custom local documents.
 
 The deployed solution support 2 answering styles:
 - `extractive question answering` will find the semantically closest
@@ -31,6 +31,12 @@ The main components of this project are:
 
 ## How to deploy the solution
 
+### Deploy with AWS Cloud9
+Follow our [step-by-step deployment instructions](documentation/aws-cloud9-deployment.md) to deploy the semantic search application if you are new to AWS, Terraform, semantic search, or you prefer detailed setp-by-step instructions.
+
+For more general deployment instructions follow the sections below.
+
+### General Deployment Instructions 
 The backend folder contains a Terraform project that deploys an OpenSearch domain and 2 ECS services:
 
 * frontend: Streamlit-based UI built by Haystack ([repo](https://github.com/deepset-ai/haystack/tree/master/ui))
@@ -41,7 +47,7 @@ The main steps to deploy the solution are:
 * Deploy the terraform stack
 * Optional: Ingest the AWS documentation
 
-## Pre-requisites
+#### Pre-requisites
 
 * Terraform v1.0+ ([getting started guide](https://learn.hashicorp.com/collections/terraform/aws-get-started))
 * Docker installed and running ([getting started guide](https://www.docker.com/get-started/))
@@ -49,7 +55,7 @@ The main steps to deploy the solution are:
 * An [EC2 Service Limit of at least 8 cores for G-instance type](https://aws.amazon.com/premiumsupport/knowledge-center/ec2-instance-limit/) if you want to deploy this solution with GPU acceleration.  
 Alternatively, you can switch to a CPU instance by changing the `instance_type = "g4dn.2xlarge"` to a CPU instance in the `infrastructure/main.tf` file.
 
-## Deploy the application infrastructure terraform stack
+#### Deploy the application infrastructure terraform stack
 
 * git clone this repository
 * **Configure**
@@ -98,7 +104,7 @@ However, searches won't return any results until you ingest any documents.
   ```
   (If you used the ingestion terrform below, make sure to first destroy the ingestion resources to avoid conflicts)
 
-## Ingest the AWS documentation
+#### Ingest the AWS documentation
 
 This second terraform stack builds, pushes and runs a docker container as an ECS task.  
 The ingestion container downloads either a single (e.g. `amazon-ec2-user-guide`) or all awsdocs repos (256) (`full`) and converts the .md files into .txt using pandoc.  
@@ -133,7 +139,7 @@ You can set the S3 bucket and its region either in the `infrastructure/terraform
     -var="infra_tf_state_s3_bucket=$S3_BUCKET"
     ```
 
-## Ingesting your own documents
+#### Ingesting your own documents
 
 Take a look at the `ingestion/awsdocs/ingest.py` how adopt the ingestion script for your own documents. In brief, you can ingest local or downloaded files via:
 ```python

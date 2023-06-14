@@ -26,6 +26,10 @@ output "ecs_cluster_name" {
   value = aws_ecs_cluster.main.name
 }
 
+output "ecs_cluster_arn" {
+  value = aws_ecs_cluster.main.arn
+}
+
 output "log_group_name" {
   value = aws_cloudwatch_log_group.app.name
 }
@@ -39,4 +43,8 @@ output "opensearch_secret" {
 
 output "ingestion_job_role" {
   value = aws_iam_role.search_api.arn
+}
+
+output "index_name" {
+  value = var.index_name
 }

@@ -51,10 +51,10 @@ def main():
         st.session_state.raw_json = None
 
     # Title
-    st.write("# Semantic Search on AWS Documentation")
+    st.write("# Semantic Search on AWS")
     st.markdown(
         """
-Ask any question on about the AWS documentation to see if we can find the correct answer to your query!
+Ask any question on about the documents to see if we can find the correct answer to your query!
 *Note: do not use keywords, but full-fledged questions.* The demo is not optimized to deal with keyword queries and might misunderstand you.
 """,
         unsafe_allow_html=True,
@@ -87,11 +87,12 @@ Ask any question on about the AWS documentation to see if we can find the correc
         step=1,
         on_change=reset_results,
     )
+    debug = st.sidebar.checkbox("Show debug info")
 
 
     hs_version = ""
     try:
-        hs_version = f" <small>(v{haystack_version()})</small>"
+        hs_version = f" <small>(v{haystack_version(answer_style=answer_style)})</small>"
     except Exception:
         pass
 
@@ -154,7 +155,7 @@ Ask any question on about the AWS documentation to see if we can find the correc
 
     # Check the connection
     with st.spinner("⌛️ &nbsp;&nbsp; Backend is starting..."):
-        if not haystack_is_ready():
+        if not haystack_is_ready(answer_style=answer_style):
             st.error("🚫 &nbsp;&nbsp; Connection Error. Is the backend running?")
             run_query = False
             reset_results()
@@ -171,7 +172,7 @@ Ask any question on about the AWS documentation to see if we can find the correc
         ):
             try:
                 st.session_state.results, st.session_state.raw_json = query(
-                    question, top_k_reader=top_k_reader, top_k_retriever=top_k_retriever, answer_style=answer_style
+                    question, top_k_reader=top_k_reader, top_k_retriever=top_k_retriever, answer_style=answer_style, debug=debug
                 )
             except JSONDecodeError as je:
                 st.error("👓 &nbsp;&nbsp; An error occurred reading the results. Is the document store working?")
@@ -213,5 +214,8 @@ Ask any question on about the AWS documentation to see if we can find the correc
                 st.write("**Relevance:** ", result["relevance"])
 
             st.write("___")
+        if debug:
+            st.subheader("REST API JSON response")
+            st.write(st.session_state.raw_json)
 
 main()

@@ -32,14 +32,3 @@ echo "Page: $c / $numPages"
       fi
    done
 done
-
-# convert markdown to plain text
-for f in $(find . -name '*.md');
-do
-  if [[ ! -f "$f.txt" ]]
-  then
-    echo $f;
-    pandoc -f markdown -t plain $f -o "$f.txt" ;
-  fi
-
-done

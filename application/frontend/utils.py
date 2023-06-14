@@ -22,11 +22,13 @@ DOC_FEEDBACK = "feedback"
 DOC_UPLOAD = "file-upload"
 
 
-def haystack_is_ready():
+def haystack_is_ready(answer_style):
     """
     Used to show the "Haystack is loading..." message
     """
     url = f"{API_ENDPOINT}/{STATUS}"
+    if(answer_style=='Generative'):
+        url = f"{API_ENDPOINT_GENERATIVE}/{STATUS}"
     try:
         if requests.get(url).status_code < 400:
             return True
@@ -37,25 +39,32 @@ def haystack_is_ready():
 
 
 @st.cache
-def haystack_version():
+def haystack_version(answer_style):
     """
     Get the Haystack version from the REST API
     """
     url = f"{API_ENDPOINT}/{HS_VERSION}"
+    if(answer_style=='Generative'):
+        url = f"{API_ENDPOINT_GENERATIVE}/{HS_VERSION}"
     return requests.get(url, timeout=0.1).json()["hs_version"]
 
 
-def query(query, filters={}, top_k_reader=5, top_k_retriever=5, answer_style='Extractive') -> Tuple[List[Dict[str, Any]], Dict[str, str]]:
+def query(query, filters={}, top_k_reader=5, top_k_retriever=5, answer_style='Extractive', debug = False) -> Tuple[List[Dict[str, Any]], Dict[str, str]]:
     """
     Send a query to the REST API and parse the answer.
     Returns both a ready-to-use representation of the results and the raw JSON.
     """
     
     url = f"{API_ENDPOINT}/{DOC_REQUEST}"
+    params = {"filters": filters, "Retriever": {"top_k": top_k_retriever}, "Reader": {"top_k": top_k_reader}, 'Query': {'debug': debug}}
+
     if(answer_style=='Generative'):
         url = f"{API_ENDPOINT_GENERATIVE}/{DOC_REQUEST}"
-    params = {"filters": filters, "Retriever": {"top_k": top_k_retriever}, "Reader": {"top_k": top_k_reader}}
-    req = {"query": query, "params": params}
+        params = {"filters": filters, "Retriever": {"top_k": top_k_retriever}, 'Query': {'debug': debug}}
+    req = {"query": query, "params": params, "debug": debug}
+    logging.info("req")
+    logging.info(req)
+    
     response_raw = requests.post(url, json=req)
 
     if response_raw.status_code >= 400 and response_raw.status_code != 503:
@@ -64,20 +73,25 @@ def query(query, filters={}, top_k_reader=5, top_k_retriever=5, answer_style='Ex
     response = response_raw.json()
     if "errors" in response:
         raise Exception(", ".join(response["errors"]))
-
+    logging.info("response")
+    logging.info(response_raw)
+    logging.info(response)
+   
     # Format response
     results = []
     answers = response["answers"]
     for answer in answers:
         if answer.get("answer", None):
             if(answer["type"]=="generative"):
+                documents = [doc for doc in response["documents"] if doc["id"] in answer["document_ids"]]
+                document_names = map(lambda doc: doc["meta"]["name"], documents)
                 results.append(
                     {
                         "context": "",
                         "answer": answer.get("answer", None),
-                        "source": ', '.join(answer["meta"]["titles"]),
-                        "relevance": sum(answer["meta"]["doc_scores"])/len(answer["meta"]["doc_scores"]),
-                        "document": [doc for doc in response["documents"] if doc["id"] in answer["meta"]["doc_ids"]][0],
+                        "source": ', '.join(document_names),
+                        "relevance": sum(map(lambda doc: doc["score"], documents))/len(documents),
+                        "document": documents[0],
                         "offset_start_in_doc": 0,
                         "_raw": answer,
                     }
@@ -89,7 +103,7 @@ def query(query, filters={}, top_k_reader=5, top_k_retriever=5, answer_style='Ex
                         "answer": answer.get("answer", None),
                         "source": answer["meta"]["name"],
                         "relevance": round(answer["score"] * 100, 2),
-                        "document": [doc for doc in response["documents"] if doc["id"] == answer["document_id"]][0],
+                        "document": [doc for doc in response["documents"] if doc["id"] == answer["document_ids"][0]][0] if answer["document_ids"] and len(answer["document_ids"]) > 0 else [],
                         "offset_start_in_doc": answer["offsets_in_document"][0]["start"],
                         "_raw": answer,
                     }

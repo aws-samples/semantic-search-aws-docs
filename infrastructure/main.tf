@@ -90,7 +90,7 @@ resource "aws_lb_listener" "search_ui" {
 }
 
 resource "aws_eip" "nat_gw" {
-  vpc        = true
+  domain     = "vpc"
   depends_on = [aws_internet_gateway.main]
 }
 
@@ -334,7 +334,7 @@ resource "aws_ecs_capacity_provider" "ec2_gpu" {
 
     managed_scaling {
       status          = "ENABLED"
-      target_capacity = 100
+      target_capacity = 50
     }
   }
 }
@@ -373,8 +373,8 @@ resource "aws_launch_template" "ec2_gpu" {
   name_prefix = "ec2_gpu_launch_template"
 
   ### Using a CPU instance ###
-  #image_id      =  data.aws_ssm_parameter.ami.value #AMI name like amzn2-ami-ecs-hvm-2.0.20220520-x86_64-ebs
-  #instance_type =  "c6i.2xlarge"
+  # image_id      =  data.aws_ssm_parameter.ami.value #AMI name like amzn2-ami-ecs-hvm-2.0.20220520-x86_64-ebs
+  # instance_type =  "c6i.2xlarge"
 
   ### Using a GPU instance ###
   image_id      = data.aws_ssm_parameter.ami_gpu.value #AMI name like amzn2-ami-ecs-gpu-hvm-2.0.20220520-x86_64-ebs
@@ -571,7 +571,7 @@ resource "aws_ecs_task_definition" "search_api" {
         },
         {
            "name": "DOCUMENTSTORE_PARAMS_INDEX",
-           "value": "awsdocs"
+           "value": "${var.index_name}"
         },
         {
            "name": "DOCUMENTSTORE_PARAMS_USERNAME",
@@ -638,17 +638,11 @@ resource "aws_ecs_task_definition" "search_api_generative" {
         },
         {
            "name": "DOCUMENTSTORE_PARAMS_INDEX",
-           "value": "awsdocs"
+           "value": "${var.index_name}"
         },
         {
            "name": "DOCUMENTSTORE_PARAMS_USERNAME",
            "value": "admin"
-        }
-      ],
-      "resourceRequirements": [
-        {
-          "type" : "GPU", 
-          "value" : "1"
         }
       ],
       "image": "${aws_ecr_repository.search_api.repository_url}:latest",
@@ -677,10 +671,12 @@ resource "aws_ecr_repository" "search_ui" {
   force_delete = true
 }
 
-# Following example in https://github.com/kreuzwerker/terraform-provider-docker/issues/3
+# Following example in https://registry.terraform.io/providers/kreuzwerker/docker/3.0.0/docs/resources/registry_image
 resource "docker_registry_image" "search_api" {
+  name = docker_image.search_api_image.name
+}
+resource "docker_image" "search_api_image" {
   name = "${local.aws_ecr_url}/${aws_ecr_repository.search_api.name}:latest"
-
   build {
     context    = "../application/backend/"
     dockerfile = "search-api.Dockerfile"
@@ -688,6 +684,10 @@ resource "docker_registry_image" "search_api" {
 }
 
 resource "docker_registry_image" "search_ui" {
+  name = docker_image.search_ui_image.name
+}
+
+resource "docker_image" "search_ui_image" {
   name = "${local.aws_ecr_url}/${aws_ecr_repository.search_ui.name}:latest"
 
   build {
@@ -700,6 +700,10 @@ resource "docker_registry_image" "search_ui" {
 ### OpenSearch cluster ###
 resource "random_password" "password" {
   length           = 16
+  min_upper = 1
+  min_lower = 1
+  min_numeric = 1
+  min_special = 1
   special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
 }

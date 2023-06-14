@@ -25,7 +25,18 @@ Terraform needs to access AWS resources from within your AWS Cloud9 environment 
 1. In your AWS Cloud9 IDE at the top left click on **AWS Cloud9** and then on **Preferences**.
 2. On the Preferences page navigate to **AWS Settings**, **Credentials**, and disable **AWS managed temporary credentials**.
 
-You need to authenticate directly with the AWS CLI in your AWS Cloud9 IDE. To do so you need to follow one of the AWS CLI [Authentication and access credentials methods](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-authentication.html). Once you authenticated with the AWS CLI you can go on to the next step.
+You need to authenticate directly with the AWS CLI in your AWS Cloud9 IDE. To do so you need to follow one of the AWS CLI [Authentication and access credentials methods](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-authentication.html). 
+
+One easy way to setup authentication is by [setting environment variables ](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html#:~:text=supported%20environment%20variables-,How%20to%20set%20environment%20variables,-The%20following%20examples)
+
+e.g. similar to the snippet below, but with your own access key and access key.
+```
+export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+export AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+export AWS_DEFAULT_REGION=us-east-1 
+```
+
+Once you authenticated with the AWS CLI you can go on to the next step.
 
 ## GPU or CPU deployment
 The default configuration uses GPU instances for the semantic search application. If you want to deploy this solution with GPU acceleration you will need to increase the _Running On-Demand G and VT instances_ [EC2 Service quota to at least 8](https://aws.amazon.com/premiumsupport/knowledge-center/ec2-instance-limit/).
@@ -44,13 +55,19 @@ instance_type =  "c6i.2xlarge"
 ## Deploy Semantic Search Infrastructure
 1. In your AWS Cloud9 environment terminal navigate to `cd ~/environment/semantic-search-aws-docs/infrastructure`.
 2. Set the following environment variables. Change their value if you are using a different region other than `us-east-1` or if you want to give the Terraform state Amazon S3 bucket and state sync Amazon DynamoDB table different names.
-    1. `REGION=us-east-1`
-    2. `S3_BUCKET="terraform-semantic-search-state-$(date +%Y%m%dt%H%M%S)"`
-    3. `SYNC_TABLE="terraform-semantic-search-state-sync"`
-3. Create the Terraform state bucket in Amazon S3 `aws s3 mb s3://$S3_BUCKET --region=$REGION` 
-4. Create the Terraform state sync table in Amazon DynamoDB `aws dynamodb create-table --table-name $SYNC_TABLE --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema   AttributeName=LockID,KeyType=HASH --billing-mode PAY_PER_REQUEST --region=$REGION`
-5. Initialize Terraform for the infrastructure deployment `terraform init -backend-config="bucket=$S3_BUCKET" -backend-config="region=$REGION" -backend-config="dynamodb_table=$SYNC_TABLE"`
-6. Deploy the Semantic Search infrastructure with Terraform `terraform apply -var="region=$REGION" -var="index_name=awsdocs"`
+
+```bash
+export REGION=us-east-1
+export S3_BUCKET="terraform-semantic-search-state-$(aws sts get-caller-identity --query Account --output text)"
+export SYNC_TABLE="terraform-semantic-search-state-sync"
+```
+
+3. Create the Terraform state bucket in Amazon S3 <br>
+`aws s3 mb s3://$S3_BUCKET --region=$REGION` 
+4. Create the Terraform state sync table in Amazon DynamoDB <br>
+`aws dynamodb create-table --table-name $SYNC_TABLE --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema   AttributeName=LockID,KeyType=HASH --billing-mode PAY_PER_REQUEST --region=$REGION`
+5. Initialize Terraform for the infrastructure deployment <br> `terraform init -backend-config="bucket=$S3_BUCKET" -backend-config="region=$REGION" -backend-config="dynamodb_table=$SYNC_TABLE"`
+6. Deploy the Semantic Search infrastructure with Terraform <br> `terraform apply -var="region=$REGION" -var="index_name=awsdocs"`
     1. Change the terraform variable `index_name` if you want to change the name of your [index](https://opensearch.org/docs/latest/dashboards/im-dashboards/index-management/) in the Amazon OpenSearch cluster. The search API uses this variable to search for documents.
     2. Enter `yes` when Terraform prompts you _"to perform these actions"_.
     3. The deployment will take 10–20 minutes. Wait for completion before moving on with the document ingestion deployment.

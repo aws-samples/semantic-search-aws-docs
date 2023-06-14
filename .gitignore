@@ -3,3 +3,8 @@
 /ingestion/conda-env
 /ingestion/data/awsdocs/
 /ingestion/data/
+# Local .terraform directories
+**/.terraform/*
+# .tfstate files
+*.tfstate
+*.tfstate.*

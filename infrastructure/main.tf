@@ -373,8 +373,8 @@ resource "aws_launch_template" "ec2_gpu" {
   name_prefix = "ec2_gpu_launch_template"
 
   ### Using a CPU instance ###
-  #image_id      =  data.aws_ssm_parameter.ami.value #AMI name like amzn2-ami-ecs-hvm-2.0.20220520-x86_64-ebs
-  #instance_type =  "c6i.2xlarge"
+  # image_id      =  data.aws_ssm_parameter.ami.value #AMI name like amzn2-ami-ecs-hvm-2.0.20220520-x86_64-ebs
+  # instance_type =  "c6i.2xlarge"
 
   ### Using a GPU instance ###
   image_id      = data.aws_ssm_parameter.ami_gpu.value #AMI name like amzn2-ami-ecs-gpu-hvm-2.0.20220520-x86_64-ebs
@@ -643,12 +643,6 @@ resource "aws_ecs_task_definition" "search_api_generative" {
         {
            "name": "DOCUMENTSTORE_PARAMS_USERNAME",
            "value": "admin"
-        }
-      ],
-      "resourceRequirements": [
-        {
-          "type" : "GPU", 
-          "value" : "1"
         }
       ],
       "image": "${aws_ecr_repository.search_api.repository_url}:latest",

@@ -39,7 +39,7 @@ For more general deployment instructions follow the sections below.
 ### General Deployment Instructions 
 The backend folder contains a Terraform project that deploys an OpenSearch domain and 2 ECS services:
 
-* frontend: Streamlit-based UI built by Haystack ([repo](https://github.com/deepset-ai/haystack/tree/master/ui))
+* frontend: Streamlit-based UI built by Haystack ([repo](https://github.com/deepset-ai/haystack-demos/tree/main/explore_the_world))
 * search API: REST API built by Haystack
 
 The main steps to deploy the solution are:

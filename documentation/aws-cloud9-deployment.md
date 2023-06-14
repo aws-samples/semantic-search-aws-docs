@@ -71,12 +71,14 @@ export SYNC_TABLE="terraform-semantic-search-state-sync"
     * Change the terraform variable `index_name` if you want to change the name of your [index](https://opensearch.org/docs/latest/dashboards/im-dashboards/index-management/) in the Amazon OpenSearch cluster. The search API uses this variable to search for documents.
     * Enter `yes` when Terraform prompts you _"to perform these actions"_.
     * The deployment will take 10–20 minutes. Wait for completion before moving on with the document ingestion deployment.
-
-## Deploy Semantic Search Ingestion
-In your AWS Cloud9 environments terminal navigate to `cd ~/environment/semantic-search-aws-docs/ingestion`. 
-* If you want to ingest the AWS documentation follow the **[Ingest AWS Documentation instructions](./ingest-aws-documentation.md)**.
-* If you want to ingest your documents from a URL (for example from Amazon S3) follow the **[Ingest Documents from URL instructions](./ingest-documents-from-url.md)**.
-* If instead you like to make local documents searchable follow the **[Local Documents Ingestion instructions](./ingest-custom-local-documents.md)**.
+7. You can receive the frontend URL using the following command. It may take some time though until the tasks are in running state <br>
+`terraform output loadbalancer_url`
+## Deploy and Run Semantic Search Ingestion
+In your AWS Cloud9 environments terminal navigate to <br>
+`cd ~/environment/semantic-search-aws-docs/ingestion`. 
+* If you want to ingest the AWS documentation follow the <br> **[Ingest AWS Documentation instructions](./ingest-aws-documentation.md)**.
+* If you want to ingest your documents from a URL (for example from Amazon S3) follow the <br> **[Ingest Documents from URL instructions](./ingest-documents-from-url.md)**.
+* If instead you like to make local documents searchable follow the <br>**[Local Documents Ingestion instructions](./ingest-custom-local-wdocuments.md)**.
 
 ### Clean up Ingestion
 After ingesting your documents you can remove the ingestion resources. Follow the [Clean up Ingestion Resources instructions](./clean-up-ingestion-resources.md) to clean up the ingestion resources.

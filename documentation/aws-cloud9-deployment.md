@@ -68,9 +68,9 @@ export SYNC_TABLE="terraform-semantic-search-state-sync"
 `aws dynamodb create-table --table-name $SYNC_TABLE --attribute-definitions AttributeName=LockID,AttributeType=S --key-schema   AttributeName=LockID,KeyType=HASH --billing-mode PAY_PER_REQUEST --region=$REGION`
 5. Initialize Terraform for the infrastructure deployment <br> `terraform init -backend-config="bucket=$S3_BUCKET" -backend-config="region=$REGION" -backend-config="dynamodb_table=$SYNC_TABLE"`
 6. Deploy the Semantic Search infrastructure with Terraform <br> `terraform apply -var="region=$REGION" -var="index_name=awsdocs"`
-    1. Change the terraform variable `index_name` if you want to change the name of your [index](https://opensearch.org/docs/latest/dashboards/im-dashboards/index-management/) in the Amazon OpenSearch cluster. The search API uses this variable to search for documents.
-    2. Enter `yes` when Terraform prompts you _"to perform these actions"_.
-    3. The deployment will take 10–20 minutes. Wait for completion before moving on with the document ingestion deployment.
+    * Change the terraform variable `index_name` if you want to change the name of your [index](https://opensearch.org/docs/latest/dashboards/im-dashboards/index-management/) in the Amazon OpenSearch cluster. The search API uses this variable to search for documents.
+    * Enter `yes` when Terraform prompts you _"to perform these actions"_.
+    * The deployment will take 10–20 minutes. Wait for completion before moving on with the document ingestion deployment.
 
 ## Deploy Semantic Search Ingestion
 In your AWS Cloud9 environments terminal navigate to `cd ~/environment/semantic-search-aws-docs/ingestion`. 

@@ -28,7 +28,12 @@ echo "Page: $c / $numPages"
    do
       if [[ "$line" == *$REPO* ]] || [[ "$line" == full ]]  ;
       then
-          git clone $line || true
+          echo "Found: $line"
+          if ! git clone -b main $line; then
+            if ! git clone -b master $line; then
+               git clone $line || true
+            fi
+          fi
       fi
    done
 done
